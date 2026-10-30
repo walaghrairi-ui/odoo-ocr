@@ -1,0 +1,113 @@
+# =====================================================================
+#  CI/CD : a chaque push sur main
+#    1. construit l'image Docker
+#    2. la pousse dans Azure Container Registry (tag = SHA du commit)
+#    3. met a jour Azure Container Apps avec cette image
+#    4. verifie qu'Odoo repond
+#
+#  Connexion a Azure par OIDC : aucun mot de passe stocke dans GitHub.
+#  Mise en place : voir CICD.md
+# =====================================================================
+name: Build et deploiement Azure
+
+on:
+  push:
+    branches: [main]
+    # Une modification de documentation ou d'infrastructure seule ne
+    # necessite pas de reconstruire l'image.
+    paths-ignore:
+      - '**.md'
+      - 'infra/**'
+      - 'docker-compose*.yml'
+      - '.env.example'
+  # Bouton "Run workflow" dans l'onglet Actions
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # jeton OIDC pour se connecter a Azure
+  contents: read
+
+# Jamais deux deploiements en meme temps
+concurrency:
+  group: deploy-azure
+  cancel-in-progress: false
+
+env:
+  ACR_NAME: acrodoobi3traga7tf44
+  IMAGE_NAME: invoice-ocr-odoo
+  RESOURCE_GROUP: rg-odoo-ocr
+  CONTAINER_APP: ca-odoo-ocr
+
+jobs:
+  build-and-deploy:
+    name: Build, push et deploiement
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      # L'image (PaddlePaddle, OpenCV...) pese plusieurs Go
+      - name: Liberer de l'espace disque
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune -af
+          df -h /
+
+      - name: Connexion a Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Connexion au registre
+        run: az acr login --name "$ACR_NAME"
+
+      - name: Preparer Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construire et pousser l'image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          # Cache dans le registre : les builds suivants ne refont que
+          # les couches modifiees (vos modules), pas PaddleOCR.
+          cache-from: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+
+      # Le "signal" de redeploiement : changer l'image de l'application
+      # cree une nouvelle revision qui remplace l'ancienne.
+      - name: Deployer la nouvelle image
+        run: |
+          az extension add --name containerapp --upgrade --only-show-errors
+          az containerapp update \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$CONTAINER_APP" \
+            --image "$ACR_NAME.azurecr.io/$IMAGE_NAME:$GITHUB_SHA" \
+            --only-show-errors -o none
+          echo "Image deployee : $IMAGE_NAME:$GITHUB_SHA"
+
+      - name: Verifier qu'Odoo repond
+        run: |
+          FQDN=$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$CONTAINER_APP" \
+                 --query properties.configuration.ingress.fqdn -o tsv)
+          echo "Adresse : https://$FQDN"
+          # Le demarrage peut prendre quelques minutes (telechargement de l'image)
+          for i in $(seq 1 30); do
+            if curl -fsS --max-time 20 "https://$FQDN/web/health"; then
+              echo ""
+              echo "Odoo repond correctement."
+              exit 0
+            fi
+            echo "Tentative $i/30 : pas encore pret, nouvel essai dans 20 s..."
+            sleep 20
+          done
+          echo "Odoo ne repond pas apres 10 minutes. Consultez les journaux :"
+          echo "az containerapp logs show -g $RESOURCE_GROUP -n $CONTAINER_APP --tail 100"
+          exit 1
