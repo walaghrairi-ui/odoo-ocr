@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Recuperer le code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # L'image (PaddlePaddle, OpenCV...) pese plusieurs Go
       - name: Liberer de l'espace disque

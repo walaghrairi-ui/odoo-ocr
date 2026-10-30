@@ -15,8 +15,20 @@ targetScope = 'resourceGroup'
 @description('Region de l\'identite.')
 param location string = 'switzerlandnorth'
 
-@description('Depot GitHub autorise (proprietaire/nom).')
-param githubRepository string = 'walaghrairi-ui/odoo-ocr'
+// GitHub identifie le depot dans le jeton OIDC par son nom ET ses numeros
+// internes : repo:<proprietaire>@<id>/<depot>@<id>:ref:refs/heads/<branche>
+// (les numeros apparaissent dans l'erreur AADSTS700213 en cas d'ecart).
+@description('Proprietaire du depot GitHub.')
+param githubOwner string = 'walaghrairi-ui'
+
+@description('Numero interne du proprietaire GitHub.')
+param githubOwnerId string = '347530424'
+
+@description('Nom du depot GitHub.')
+param githubRepo string = 'odoo-ocr'
+
+@description('Numero interne du depot GitHub.')
+param githubRepoId string = '1439079356'
 
 @description('Branche autorisee a deployer.')
 param githubBranch string = 'main'
@@ -61,7 +73,7 @@ resource githubFederation 'Microsoft.ManagedIdentity/userAssignedIdentities/fede
   name: 'github-${githubBranch}'
   properties: {
     issuer: 'https://token.actions.githubusercontent.com'
-    subject: 'repo:${githubRepository}:ref:refs/heads/${githubBranch}'
+    subject: 'repo:${githubOwner}@${githubOwnerId}/${githubRepo}@${githubRepoId}:ref:refs/heads/${githubBranch}'
     audiences: [
       'api://AzureADTokenExchange'
     ]

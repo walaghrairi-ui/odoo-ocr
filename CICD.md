@@ -92,7 +92,7 @@ az deployment group create --resource-group rg-odoo-ocr --name odoo-app --templa
 
 | Erreur dans Actions | Cause probable |
 |---|---|
-| `AADSTS70021` / `No matching federated identity record` | Les secrets GitHub ou le nom du dépôt/de la branche ne correspondent pas à `github-ci.bicep` |
+| `AADSTS70021` / `No matching federated identity record` | Le sujet OIDC ne correspond pas : comparez celui affiché dans l’erreur (`repo:…@id/…@id:ref:…`) avec les paramètres `githubOwnerId` / `githubRepoId` de `github-ci.bicep` |
 | `unauthorized` au push | Le rôle AcrPush n'est pas encore actif : relancez quelques minutes plus tard |
 | `AuthorizationFailed` au déploiement | Rôle Contributor ou Managed Identity Operator manquant : redéployez `github-ci.bicep` |
 | `No space left on device` | Image trop lourde pour le runner : prévenir, on réduira l'image |
