@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="invoice_ocr_agent.ChatAgent">
+        <div class="o_agent_layout">
+
+            <!-- ============ BARRE LATERALE ============ -->
+            <div class="o_agent_sidebar">
+                <div class="o_agent_sidebar_head">
+                    <div class="o_agent_brand">
+                        <div class="o_agent_brand_mark"><i class="fa fa-magic"/></div>
+                        <span class="o_agent_brand_name">Assistant IA</span>
+                    </div>
+                </div>
+
+                <button class="o_agent_new_btn" t-on-click="clearChat">
+                    <i class="fa fa-plus"/>
+                    <span>Nouvelle conversation</span>
+                </button>
+
+                <div class="o_agent_conv_list">
+                    <div t-if="state.conversations.length === 0" class="o_agent_conv_empty">
+                        Aucune conversation
+                    </div>
+                    <t t-foreach="state.conversations" t-as="conv" t-key="conv.id">
+                        <div t-attf-class="o_agent_conv_item {{ conv.id === state.activeConversationId ? 'o_agent_conv_active' : '' }}"
+                             t-on-click="() => this.openConversation(conv.id)">
+                            <i class="fa fa-comment-o o_agent_conv_ic"/>
+                            <t t-if="state.renamingId === conv.id">
+                                <input class="o_agent_rename_input"
+                                       t-model="state.renameValue"
+                                       t-on-keydown="(ev) => this.onRenameKeydown(ev, conv.id)"
+                                       t-on-click.stop=""/>
+                                <button class="o_agent_conv_ok"
+                                        t-on-click="(ev) => this.saveRename(conv.id, ev)"
+                                        title="Valider">
+                                    <i class="fa fa-check"/>
+                                </button>
+                                <button class="o_agent_conv_cancel"
+                                        t-on-click="(ev) => this.cancelRename(ev)"
+                                        title="Annuler">
+                                    <i class="fa fa-times"/>
+                                </button>
+                            </t>
+                            <t t-else="">
+                                <span class="o_agent_conv_name" t-esc="conv.name"/>
+                                <button class="o_agent_conv_edit"
+                                        t-on-click="(ev) => this.startRename(conv, ev)"
+                                        title="Renommer">
+                                    <i class="fa fa-pencil"/>
+                                </button>
+                                <button class="o_agent_conv_del"
+                                        t-on-click="(ev) => this.deleteConversation(conv.id, ev)"
+                                        title="Supprimer">
+                                    <i class="fa fa-trash-o"/>
+                                </button>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+
+                <div t-if="state.conversations.length > 0" class="o_agent_sidebar_foot">
+                    <button class="o_agent_clear_all" t-on-click="deleteAllHistory">
+                        <i class="fa fa-trash"/>
+                        <span>Effacer l'historique</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============ ZONE DE CHAT ============ -->
+            <div class="o_agent_app">
+
+                <!-- Zone de conversation -->
+                <div class="o_agent_scroll" t-ref="messages">
+
+                    <!-- Accueil -->
+                    <div t-if="state.messages.length === 0" class="o_agent_intro">
+                        <div class="o_agent_intro_inner">
+                            <div class="o_agent_intro_badge"><i class="fa fa-magic"/></div>
+                            <h1 class="o_agent_intro_title">Comment puis-je vous aider ?</h1>
+                            <p class="o_agent_intro_sub">
+                                Posez une question sur vos factures et tickets en langage naturel.
+                            </p>
+                            <div class="o_agent_cards">
+                                <t t-foreach="suggestions" t-as="sugg" t-key="sugg">
+                                    <button class="o_agent_card" t-on-click="() => this.sendSuggestion(sugg)">
+                                        <i class="fa fa-comment-o"/>
+                                        <span t-esc="sugg"/>
+                                    </button>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div t-else="" class="o_agent_thread">
+                        <t t-foreach="state.messages" t-as="msg" t-key="msg_index">
+
+                            <!-- Message utilisateur (a droite) -->
+                            <div t-if="msg.role === 'user'" class="o_agent_line o_agent_line_user">
+                                <div class="o_agent_bubble o_agent_bubble_user">
+                                    <t t-esc="msg.text"/>
+                                </div>
+                                <div class="o_agent_avatar o_agent_avatar_user">
+                                    <i class="fa fa-user"/>
+                                </div>
+                            </div>
+
+                            <!-- Message assistant (a gauche) -->
+                            <div t-else="" class="o_agent_line o_agent_line_ai">
+                                <div class="o_agent_avatar o_agent_avatar_ai">
+                                    <i class="fa fa-magic"/>
+                                </div>
+                                <div class="o_agent_ai_content">
+                                    <div class="o_agent_bubble o_agent_bubble_ai">
+                                        <t t-esc="msg.text"/>
+                                    </div>
+
+                                    <!-- Indicateur d'evolution -->
+                                    <div t-if="msg.kpis" class="o_agent_kpi_row o_agent_kpi_solo">
+                                        <!-- Ancien format (3 cartes) conserve pour l'historique -->
+                                        <t t-if="msg.kpis.total_global !== undefined">
+                                            <div class="o_agent_kpi_card o_agent_kpi_total">
+                                                <div class="o_agent_kpi_glow"/>
+                                                <div class="o_agent_kpi_icon"><i class="fa fa-credit-card"/></div>
+                                                <div class="o_agent_kpi_value">
+                                                    <t t-esc="formatNumber(msg.kpis.total_global)"/>
+                                                    <span class="o_agent_kpi_unit" t-esc="msg.kpis.devise"/>
+                                                </div>
+                                                <div class="o_agent_kpi_label">Montant total</div>
+                                            </div>
+                                        </t>
+                                        <t t-if="msg.kpis.nombre_global !== undefined">
+                                            <div class="o_agent_kpi_card o_agent_kpi_count">
+                                                <div class="o_agent_kpi_glow"/>
+                                                <div class="o_agent_kpi_icon"><i class="fa fa-files-o"/></div>
+                                                <div class="o_agent_kpi_value" t-esc="msg.kpis.nombre_global"/>
+                                                <div class="o_agent_kpi_label">Documents</div>
+                                            </div>
+                                        </t>
+                                        <div t-if="msg.kpis.evolution !== null and msg.kpis.evolution !== undefined"
+                                             t-attf-class="o_agent_kpi_card {{ msg.kpis.evolution >= 0 ? 'o_agent_kpi_up' : 'o_agent_kpi_down' }}">
+                                            <div class="o_agent_kpi_glow"/>
+                                            <div class="o_agent_kpi_icon">
+                                                <i t-attf-class="fa {{ msg.kpis.evolution >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }}"/>
+                                            </div>
+                                            <div class="o_agent_kpi_value">
+                                                <t t-if="msg.kpis.evolution >= 0">+</t><t t-esc="msg.kpis.evolution"/>%
+                                            </div>
+                                            <div class="o_agent_kpi_label">
+                                                <t t-if="msg.kpis.depart">
+                                                    Evolution <t t-esc="msg.kpis.depart"/> &#8594; <t t-esc="msg.kpis.arrivee"/>
+                                                </t>
+                                                <t t-else="">Evolution</t>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tableau -->
+                                    <div t-if="msg.table" class="o_agent_table_wrap">
+                                        <div class="o_agent_table_head">
+                                            <i class="fa fa-table"/>
+                                            <span t-esc="msg.table.title"/>
+                                        </div>
+                                        <table class="o_agent_table">
+                                            <thead>
+                                                <tr>
+                                                    <t t-foreach="msg.table.headers" t-as="h" t-key="h_index">
+                                                        <th t-esc="h"/>
+                                                    </t>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="msg.table.rows" t-as="row" t-key="row_index">
+                                                    <tr t-attf-style="animation-delay: {{ row_index * 0.08 }}s;">
+                                                        <t t-foreach="row" t-as="cell" t-key="cell_index">
+                                                            <td>
+                                                                <span t-if="cell_index === 0" class="o_agent_period_dot"/>
+                                                                <t t-esc="cell"/>
+                                                            </td>
+                                                        </t>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Action a confirmer -->
+                                    <div t-if="msg.pendingAction"
+                                         t-attf-class="o_agent_action_box o_agent_act_{{ msg.pendingAction.type }}">
+                                        <t t-if="msg.actionState === 'pending'">
+                                            <div class="o_agent_action_head">
+                                                <i t-attf-class="fa {{ msg.pendingAction.icone || 'fa-shield' }}"/>
+                                                <span t-esc="msg.pendingAction.titre || 'Selectionnez les documents a valider'"/>
+                                            </div>
+
+                                            <!-- Presentation groupee par urgence (calendrier de paiement) -->
+                                            <div t-if="msg.pendingAction.groupes" class="o_agent_pay_wrap">
+                                                <div class="o_agent_pay_tools">
+                                                    <button class="o_agent_pay_all"
+                                                            t-on-click="() => this.toggleAllDocs(msg_index)">
+                                                        <i t-attf-class="fa {{ allSelected(msg) ? 'fa-check-square-o' : 'fa-square-o' }}"/>
+                                                        <span t-esc="allSelected(msg) ? 'Tout deselectionner' : 'Tout selectionner'"/>
+                                                    </button>
+                                                </div>
+
+                                                <t t-foreach="msg.pendingAction.groupes" t-as="grp" t-key="grp.cle">
+                                                    <div t-attf-class="o_agent_pay_group o_agent_pay_g_{{ grp.cle }}">
+                                                        <div class="o_agent_pay_ghead">
+                                                            <span class="o_agent_pay_dot"/>
+                                                            <span class="o_agent_pay_glabel" t-esc="grp.label"/>
+                                                            <span class="o_agent_pay_gmeta">
+                                                                <t t-esc="grp.compte"/>
+                                                                <span class="o_agent_pay_gsep">·</span>
+                                                                <t t-esc="grp.montant"/>
+                                                                <t t-esc="msg.pendingAction.devise"/>
+                                                            </span>
+                                                        </div>
+
+                                                        <t t-foreach="grp.documents" t-as="doc" t-key="doc.id">
+                                                            <div t-attf-class="o_agent_pay_row {{ isSelected(msg, doc.id) ? 'o_agent_pay_on' : 'o_agent_pay_off' }}"
+                                                                 t-on-click="() => this.toggleDoc(msg_index, doc.id)">
+                                                                <div class="o_agent_pay_check">
+                                                                    <input type="checkbox"
+                                                                           t-att-checked="isSelected(msg, doc.id)"
+                                                                           t-on-click.stop="() => this.toggleDoc(msg_index, doc.id)"/>
+                                                                </div>
+                                                                <div class="o_agent_pay_main">
+                                                                    <div class="o_agent_pay_top">
+                                                                        <span class="o_agent_pay_name" t-esc="doc.fournisseur"/>
+                                                                        <span class="o_agent_pay_pill" t-esc="doc.delai"/>
+                                                                    </div>
+                                                                    <div class="o_agent_pay_time">
+                                                                        <i class="fa fa-flag-o"/>
+                                                                        <span>echeance <t t-esc="doc.echeance"/></span>
+                                                                        <i class="fa fa-long-arrow-right o_agent_pay_arrow"/>
+                                                                        <i class="fa fa-bell-o"/>
+                                                                        <span>rappel <t t-esc="doc.rappel"/></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="o_agent_pay_amt">
+                                                                    <span class="o_agent_pay_val" t-esc="doc.montant"/>
+                                                                    <span class="o_agent_pay_dev" t-esc="msg.pendingAction.devise"/>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                            </div>
+
+                                            <table t-else="" class="o_agent_sel_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="o_agent_sel_check">
+                                                            <input type="checkbox"
+                                                                   t-att-checked="allSelected(msg)"
+                                                                   t-on-change="() => this.toggleAllDocs(msg_index)"/>
+                                                        </th>
+                                                        <th>Fournisseur</th>
+                                                        <th>Date</th>
+                                                        <th>Type</th>
+                                                        <th class="o_agent_sel_amount">Montant</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="msg.pendingAction.documents" t-as="doc" t-key="doc.id">
+                                                        <tr t-attf-class="{{ isSelected(msg, doc.id) ? 'o_agent_sel_on' : 'o_agent_sel_off' }}"
+                                                            t-on-click="() => this.toggleDoc(msg_index, doc.id)">
+                                                            <td class="o_agent_sel_check">
+                                                                <input type="checkbox"
+                                                                       t-att-checked="isSelected(msg, doc.id)"
+                                                                       t-on-click.stop="() => this.toggleDoc(msg_index, doc.id)"/>
+                                                            </td>
+                                                            <td t-esc="doc.fournisseur"/>
+                                                            <td t-esc="doc.date"/>
+                                                            <td>
+                                                                <span class="o_agent_sel_badge" t-esc="doc.type"/>
+                                                            </td>
+                                                            <td class="o_agent_sel_amount">
+                                                                <t t-esc="doc.montant"/>
+                                                                <span class="o_agent_sel_dev" t-esc="msg.pendingAction.devise"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="o_agent_sel_recap">
+                                                <span class="o_agent_sel_count">
+                                                    <t t-esc="msg.selectedIds.length"/> / <t t-esc="msg.pendingAction.count"/> selectionne(s)
+                                                </span>
+                                                <span class="o_agent_sel_total">
+                                                    <t t-esc="msg.pendingAction.total_label || 'Total'"/> :
+                                                    <t t-esc="selectedTotal(msg)"/>
+                                                    <t t-esc="msg.pendingAction.devise"/>
+                                                </span>
+                                            </div>
+
+                                            <div class="o_agent_action_btns">
+                                                <button class="o_agent_act_cancel"
+                                                        t-on-click="() => this.dismissAction(msg_index)">
+                                                    Annuler
+                                                </button>
+                                                <button class="o_agent_act_confirm"
+                                                        t-att-disabled="msg.selectedIds.length === 0"
+                                                        t-on-click="() => this.runAction(msg_index)">
+                                                    <i t-attf-class="fa {{ msg.pendingAction.groupes ? 'fa-bell' : 'fa-check' }}"/>
+                                                    <span t-esc="confirmLabel(msg)"/>
+                                                </button>
+                                            </div>
+                                        </t>
+                                        <t t-elif="msg.actionState === 'running'">
+                                            <div class="o_agent_action_state o_agent_act_running">
+                                                <i class="fa fa-spinner fa-spin"/>
+                                                <span t-esc="msg.pendingAction.texte_encours || 'Validation en cours...'"/>
+                                            </div>
+                                        </t>
+                                        <t t-elif="msg.actionState === 'done'">
+                                            <div class="o_agent_action_state o_agent_act_done">
+                                                <i class="fa fa-check-circle"/>
+                                                <span>Action executee</span>
+                                            </div>
+                                        </t>
+                                        <t t-elif="msg.actionState === 'cancelled'">
+                                            <div class="o_agent_action_state o_agent_act_cancelled">
+                                                <i class="fa fa-times-circle"/>
+                                                <span>Action annulee</span>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="o_agent_action_state o_agent_act_failed">
+                                                <i class="fa fa-exclamation-circle"/>
+                                                <span>Action non aboutie</span>
+                                            </div>
+                                        </t>
+                                    </div>
+
+                                    <!-- Graphique -->
+                                    <div t-if="msg.chart" class="o_agent_chart_wrap">
+                                        <div class="o_agent_chart_head">
+                                            <i t-attf-class="fa {{ msg.chart.type === 'pie' ? 'fa-pie-chart' : (msg.chart.type === 'line' ? 'fa-line-chart' : 'fa-bar-chart') }}"/>
+                                            <span t-esc="chartHeading(msg.chart)"/>
+                                        </div>
+                                        <div class="o_agent_chart_canvas_box">
+                                            <canvas t-att-id="'agentChart_' + msg_index" class="o_agent_chart_canvas"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Chargement -->
+                        <div t-if="state.loading" class="o_agent_line o_agent_line_ai">
+                            <div class="o_agent_avatar o_agent_avatar_ai">
+                                <i class="fa fa-magic"/>
+                            </div>
+                            <div class="o_agent_ai_content">
+                                <div class="o_agent_bubble o_agent_bubble_ai">
+                                    <span class="o_agent_typing">
+                                        <span class="o_agent_dot"/>
+                                        <span class="o_agent_dot"/>
+                                        <span class="o_agent_dot"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Composeur -->
+                <div class="o_agent_composer">
+                    <div class="o_agent_composer_inner">
+                        <input type="text"
+                               class="o_agent_field"
+                               placeholder="Ecrivez votre message..."
+                               t-ref="input"
+                               t-model="state.currentInput"
+                               t-on-keydown="onKeydown"/>
+                        <button class="o_agent_submit"
+                                t-on-click="sendMessage"
+                                t-att-disabled="state.loading">
+                            <i class="fa fa-arrow-up"/>
+                        </button>
+                    </div>
+                    <div class="o_agent_disclaimer">
+                        L'assistant peut se tromper. Verifiez les informations importantes.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============ POPUP DE CONFIRMATION ============ -->
+            <div t-if="state.confirmOpen" class="o_agent_modal_overlay" t-on-click="confirmNo">
+                <div class="o_agent_modal" t-on-click.stop="">
+                    <div class="o_agent_modal_icon">
+                        <i class="fa fa-exclamation-triangle"/>
+                    </div>
+                    <div class="o_agent_modal_title" t-esc="state.confirmTitle"/>
+                    <div class="o_agent_modal_body" t-esc="state.confirmBody"/>
+                    <div class="o_agent_modal_actions">
+                        <button class="o_agent_modal_cancel" t-on-click="confirmNo">
+                            Annuler
+                        </button>
+                        <button class="o_agent_modal_confirm" t-on-click="confirmYes">
+                            <i class="fa fa-trash"/>
+                            <span t-esc="state.confirmLabel"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </t>
+
+</templates>

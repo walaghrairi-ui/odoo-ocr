@@ -1,0 +1,16 @@
+# Dependances Python des modules invoice_ocr_*
+# (Odoo et ses propres dependances sont deja dans l'image officielle)
+
+# invoice_ocr_pdf : extraction du texte des PDF
+pymupdf==1.26.4
+
+# invoice_ocr_image : OCR des images.
+# Version 2.x volontairement : le code appelle ocr.ocr(image, cls=True),
+# une API qui a change en PaddleOCR 3.x.
+paddleocr==2.10.0
+paddlepaddle==2.6.2
+numpy<2
+protobuf==3.20.3
+
+# invoice_ocr_ai / invoice_ocr_agent : appels a l'IA Groq
+groq==0.31.0

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action client qui ouvre l'interface de chat de l'agent IA -->
+    <record id="action_invoice_agent_chat" model="ir.actions.client">
+        <field name="name">Assistant IA</field>
+        <field name="tag">invoice_ocr_agent.chat</field>
+    </record>
+
+    <!-- Entree de menu sous Fournisseurs -->
+    <menuitem id="menu_invoice_agent_chat"
+              name="Assistant IA"
+              parent="account.menu_finance_payables"
+              action="action_invoice_agent_chat"
+              sequence="99"/>
+
+</odoo>

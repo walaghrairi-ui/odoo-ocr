@@ -1,0 +1,27 @@
+# =====================================================================
+#  Odoo en local (Docker) + base PostgreSQL hebergee sur Azure
+#  Lancement : docker compose -f docker-compose.azure.yml up -d
+#  Les valeurs AZURE_PG_* sont lues dans le fichier .env
+# =====================================================================
+name: invoice-ocr-azure
+
+services:
+  odoo:
+    build: .
+    image: invoice-ocr-odoo:19.0
+    restart: unless-stopped
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+    environment:
+      # Lus par le script de demarrage de l'image officielle Odoo
+      HOST: ${AZURE_PG_HOST}
+      USER: ${AZURE_PG_USER}
+      PASSWORD: ${AZURE_PG_PASSWORD}
+      # Azure exige une connexion chiffree (SSL)
+      PGSSLMODE: require
+    volumes:
+      - odoo-data-azure:/var/lib/odoo
+      - ./custom_addons:/mnt/extra-addons
+
+volumes:
+  odoo-data-azure:

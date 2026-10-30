@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { "value": "switzerlandnorth" },
+    "appName": { "value": "odoo-ocr" },
+    "imageName": { "value": "invoice-ocr-odoo" },
+    "postgresServerName": { "value": "psql-odoo-ocr-2026" },
+    "postgresUser": { "value": "odooadmin" },
+    "cpu": { "value": "1.5" },
+    "memory": { "value": "3Gi" },
+    "minReplicas": { "value": 0 }
+  }
+}

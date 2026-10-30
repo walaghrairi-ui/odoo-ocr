@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================
+         PRIVILEGES DE L'ASSISTANT
+         =================================================================
+         Interroger l'assistant ne modifie rien : tout utilisateur interne
+         peut poser des questions, lire les tableaux et les graphiques.
+         Executer une action ecrit dans la comptabilite : seul le privilege
+         "Responsable" l'autorise.
+
+         Le libelle affiche quand aucun privilege n'est accorde est
+         "Utilisateur" : c'est le niveau par defaut de tout employe.
+         ================================================================= -->
+    <record id="privilege_agent" model="res.groups.privilege">
+        <field name="name">Assistant IA Factures</field>
+        <field name="description">Autorise l'execution des actions proposees par l'assistant IA : validation de documents, planification des rappels de paiement.</field>
+        <field name="placeholder">Utilisateur</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="sequence">90</field>
+    </record>
+
+    <record id="group_agent_manager" model="res.groups">
+        <field name="name">Responsable</field>
+        <field name="privilege_id" ref="privilege_agent"/>
+        <field name="comment">Peut executer les actions proposees par l'assistant IA : valider des documents, planifier des rappels de paiement.</field>
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- Chaque utilisateur ne voit que SES conversations -->
+    <record id="rule_agent_conversation_own" model="ir.rule">
+        <field name="name">Conversations Assistant IA : proprietaire uniquement</field>
+        <field name="model_id" ref="model_invoice_agent_conversation"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Chaque utilisateur ne voit que les messages de SES conversations -->
+    <record id="rule_agent_message_own" model="ir.rule">
+        <field name="name">Messages Assistant IA : proprietaire uniquement</field>
+        <field name="model_id" ref="model_invoice_agent_message"/>
+        <field name="domain_force">[('conversation_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

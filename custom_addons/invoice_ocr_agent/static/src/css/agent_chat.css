@@ -1,0 +1,1475 @@
+/* =====================================================================
+   Assistant IA - Design premium (dashboard pro) + Historique lateral
+   ===================================================================== */
+
+/* Layout general : barre laterale + zone chat */
+.o_agent_layout {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* -------------------------------------------------- Barre laterale */
+.o_agent_sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: #f7f7f9;
+    border-right: 1px solid #ececec;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.o_agent_sidebar_head {
+    padding: 18px 18px 12px 18px;
+}
+
+.o_agent_sidebar .o_agent_brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.o_agent_sidebar .o_agent_brand_mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.o_agent_sidebar .o_agent_brand_name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.o_agent_new_btn {
+    margin: 0 14px 14px 14px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.o_agent_new_btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(99, 102, 241, 0.45);
+}
+
+.o_agent_conv_list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 10px;
+}
+
+.o_agent_conv_list::-webkit-scrollbar { width: 6px; }
+.o_agent_conv_list::-webkit-scrollbar-thumb { background: #dcdce0; border-radius: 3px; }
+
+.o_agent_conv_empty {
+    text-align: center;
+    font-size: 13px;
+    color: #a0a0a8;
+    padding: 20px 10px;
+}
+
+.o_agent_conv_item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.o_agent_conv_item:hover {
+    background: #ececf1;
+}
+
+.o_agent_conv_active {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.o_agent_conv_ic {
+    color: #8b5cf6;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.o_agent_conv_name {
+    flex: 1;
+    font-size: 13.5px;
+    color: #33333a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.o_agent_conv_del {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: #b0b0b8;
+    border-radius: 7px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.o_agent_conv_item:hover .o_agent_conv_del {
+    opacity: 1;
+}
+
+.o_agent_conv_del:hover {
+    background: #fde8e8;
+    color: #dc2626;
+}
+
+.o_agent_sidebar_foot {
+    padding: 12px 14px;
+    border-top: 1px solid #ececec;
+}
+
+.o_agent_clear_all {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #f0d0d0;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.o_agent_clear_all:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+}
+
+/* -------------------------------------------------- Zone de chat */
+.o_agent_app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    background: #ffffff;
+    color: #1a1a1a;
+    min-width: 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ---------------------------------------------------------- Barre du haut */
+.o_agent_topbar {
+    flex-shrink: 0;
+    border-bottom: 1px solid #ececec;
+    background: #ffffff;
+}
+
+.o_agent_topbar_inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.o_agent_brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.o_agent_brand_mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.o_agent_brand_name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.o_agent_newchat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border: 1px solid #e2e2e2;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #444;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.o_agent_newchat:hover {
+    background: #f7f7f9;
+    border-color: #6366f1;
+    color: #6366f1;
+}
+
+/* ------------------------------------------------------- Zone scrollable */
+.o_agent_scroll {
+    flex: 1;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.o_agent_scroll::-webkit-scrollbar { width: 8px; }
+.o_agent_scroll::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
+
+/* -------------------------------------------------------------- Accueil */
+.o_agent_intro {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.o_agent_intro_inner {
+    width: 100%;
+    max-width: 720px;
+    text-align: center;
+}
+
+.o_agent_intro_badge {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px auto;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #ffffff;
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+    animation: kpi_pop 0.6s ease both;
+}
+
+.o_agent_intro_title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
+}
+
+.o_agent_intro_sub {
+    font-size: 15px;
+    color: #6b6b6b;
+    margin: 0 0 34px 0;
+}
+
+.o_agent_cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.o_agent_card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #333;
+    font-size: 14px;
+    text-align: left;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.o_agent_card i {
+    color: #8b5cf6;
+    font-size: 15px;
+}
+
+.o_agent_card:hover {
+    background: #faf9ff;
+    border-color: #8b5cf6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15);
+}
+
+/* --------------------------------------------------------- Fil de messages */
+.o_agent_thread {
+    padding: 20px 0 40px 0;
+}
+
+.o_agent_row { width: 100%; }
+
+.o_agent_row_assistant {
+    background: #fafafa;
+}
+
+.o_agent_row_inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 22px 24px;
+}
+
+.o_agent_role {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b6b6b;
+}
+
+.o_agent_role_icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #ffffff;
+}
+
+.o_agent_role_icon_ai {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.o_agent_role_icon_user {
+    background: #2a2a2a;
+}
+
+.o_agent_text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #1f1f1f;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding-left: 33px;
+}
+
+/* --------------------------------------------------------- Indicateur ... */
+.o_agent_typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.o_agent_dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #b8b8b8;
+    animation: agent_bounce 1.4s infinite ease-in-out;
+}
+
+.o_agent_dot:nth-child(2) { animation-delay: 0.2s; }
+.o_agent_dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes agent_bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ==================================================================
+   CARTES KPI (premium)
+   ================================================================== */
+.o_agent_kpi_row {
+    display: flex;
+    gap: 14px;
+    margin: 18px 0 10px 33px;
+    flex-wrap: wrap;
+}
+
+.o_agent_kpi_card {
+    flex: 1;
+    min-width: 150px;
+    padding: 20px;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    animation: kpi_pop 0.55s ease both;
+}
+
+.o_agent_kpi_card:nth-child(1) { animation-delay: 0.05s; }
+.o_agent_kpi_card:nth-child(2) { animation-delay: 0.16s; }
+.o_agent_kpi_card:nth-child(3) { animation-delay: 0.27s; }
+
+@keyframes kpi_pop {
+    from { opacity: 0; transform: translateY(16px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* halo decoratif en haut a droite de chaque carte */
+.o_agent_kpi_glow {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    opacity: 0.12;
+    filter: blur(6px);
+}
+
+.o_agent_kpi_total .o_agent_kpi_glow { background: #6366f1; }
+.o_agent_kpi_count .o_agent_kpi_glow { background: #14b8a6; }
+.o_agent_kpi_up .o_agent_kpi_glow    { background: #22c55e; }
+.o_agent_kpi_down .o_agent_kpi_glow  { background: #ef4444; }
+
+.o_agent_kpi_icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    color: #ffffff;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.o_agent_kpi_total .o_agent_kpi_icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 6px 16px rgba(99,102,241,0.4); }
+.o_agent_kpi_count .o_agent_kpi_icon { background: linear-gradient(135deg, #14b8a6, #0ea5e9); box-shadow: 0 6px 16px rgba(20,184,166,0.4); }
+.o_agent_kpi_up .o_agent_kpi_icon    { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 6px 16px rgba(34,197,94,0.4); }
+.o_agent_kpi_down .o_agent_kpi_icon  { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 16px rgba(239,68,68,0.4); }
+
+.o_agent_kpi_value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.o_agent_kpi_unit {
+    font-size: 14px;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-left: 2px;
+}
+
+.o_agent_kpi_label {
+    font-size: 12.5px;
+    color: #6b7280;
+    margin-top: 5px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+}
+
+.o_agent_kpi_up .o_agent_kpi_value  { color: #16a34a; }
+.o_agent_kpi_down .o_agent_kpi_value { color: #dc2626; }
+
+/* ==================================================================
+   TABLEAU (premium)
+   ================================================================== */
+.o_agent_table_wrap {
+    margin: 16px 0 4px 33px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    animation: block_reveal 0.6s ease both;
+}
+
+.o_agent_table_head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.o_agent_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.o_agent_table thead th {
+    text-align: left;
+    padding: 13px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #8b8b99;
+    background: #f9f9fb;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.o_agent_table tbody tr {
+    animation: row_slide 0.5s ease both;
+}
+
+@keyframes row_slide {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.o_agent_table tbody td {
+    padding: 15px 20px;
+    color: #1f2937;
+    border-bottom: 1px solid #f3f3f6;
+}
+
+.o_agent_table tbody tr:last-child td { border-bottom: none; }
+
+.o_agent_table tbody tr:hover { background: #f7f8ff; }
+
+.o_agent_table tbody td:first-child {
+    font-weight: 700;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.o_agent_period_dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* ==================================================================
+   GRAPHIQUE (premium)
+   ================================================================== */
+.o_agent_chart_wrap {
+    margin: 16px 0 4px 33px;
+    padding: 4px;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    animation: block_reveal 0.6s ease both;
+    animation-delay: 0.15s;
+}
+
+.o_agent_chart_head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px 6px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4f46e5;
+}
+
+.o_agent_chart_canvas_box {
+    padding: 10px 18px 20px 18px;
+    height: 300px;
+}
+
+.o_agent_chart_canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@keyframes block_reveal {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------- Composeur */
+.o_agent_composer {
+    flex-shrink: 0;
+    background: #ffffff;
+    border-top: 1px solid #ececec;
+    padding: 16px 24px 12px 24px;
+}
+
+.o_agent_composer_inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f7f7f9;
+    border: 1px solid #e2e2e2;
+    border-radius: 15px;
+    padding: 6px 6px 6px 18px;
+    transition: all 0.15s ease;
+}
+
+.o_agent_composer_inner:focus-within {
+    border-color: #8b5cf6;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
+}
+
+.o_agent_field {
+    flex: 1;
+    height: 42px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    outline: none;
+    color: #1a1a1a;
+}
+
+.o_agent_field::placeholder { color: #9a9a9a; }
+
+.o_agent_submit {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.o_agent_submit:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.45);
+}
+
+.o_agent_submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.o_agent_disclaimer {
+    max-width: 860px;
+    margin: 8px auto 0 auto;
+    text-align: center;
+    font-size: 12px;
+    color: #9a9a9a;
+}
+
+/* ------------------------------------------------------------ Responsive */
+@media (max-width: 640px) {
+    .o_agent_cards { grid-template-columns: 1fr; }
+    .o_agent_kpi_row { flex-direction: column; }
+}
+
+/* ==================================================================
+   POPUP DE CONFIRMATION (premium)
+   ================================================================== */
+.o_agent_modal_overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: modal_fade 0.2s ease;
+}
+
+@keyframes modal_fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.o_agent_modal {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 32px 28px 24px 28px;
+    text-align: center;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+    animation: modal_pop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal_pop {
+    from { opacity: 0; transform: translateY(20px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.o_agent_modal_icon {
+    width: 66px;
+    height: 66px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #dc2626;
+    animation: icon_shake 0.5s ease;
+}
+
+@keyframes icon_shake {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+.o_agent_modal_title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 10px;
+}
+
+.o_agent_modal_body {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #6b7280;
+    margin-bottom: 26px;
+}
+
+.o_agent_modal_actions {
+    display: flex;
+    gap: 12px;
+}
+
+.o_agent_modal_cancel,
+.o_agent_modal_confirm {
+    flex: 1;
+    padding: 13px;
+    border-radius: 12px;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.o_agent_modal_cancel {
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+}
+
+.o_agent_modal_cancel:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.o_agent_modal_confirm {
+    border: none;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.o_agent_modal_confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(239, 68, 68, 0.5);
+}
+
+/* ==================================================================
+   CHAT STYLE MESSAGERIE (bulles gauche/droite)
+   ================================================================== */
+.o_agent_thread {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 26px 24px 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.o_agent_line {
+    display: flex;
+    gap: 11px;
+    animation: line_in 0.3s ease both;
+}
+
+@keyframes line_in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.o_agent_line_user {
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.o_agent_line_ai {
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.o_agent_avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.o_agent_avatar_ai {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+}
+
+.o_agent_avatar_user {
+    background: #2a2a2a;
+}
+
+.o_agent_bubble {
+    padding: 13px 17px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+.o_agent_bubble_user {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 5px;
+    max-width: 70%;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+}
+
+.o_agent_bubble_ai {
+    background: #f5f5f7;
+    color: #1f1f1f;
+    border: 1px solid #ececf0;
+    border-bottom-left-radius: 5px;
+    align-self: flex-start;
+    max-width: 85%;
+}
+
+.o_agent_ai_content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Les blocs riches (KPI, tableau, graphique) sous la bulle assistant */
+.o_agent_ai_content .o_agent_kpi_row {
+    margin: 16px 0 4px 0;
+}
+
+.o_agent_ai_content .o_agent_table_wrap,
+.o_agent_ai_content .o_agent_chart_wrap {
+    margin: 14px 0 4px 0;
+}
+
+/* ==================================================================
+   RENOMMAGE DES CONVERSATIONS
+   ================================================================== */
+.o_agent_rename_input {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid #8b5cf6;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 13px;
+    color: #1a1a1a;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+.o_agent_conv_edit,
+.o_agent_conv_ok,
+.o_agent_conv_cancel {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    font-size: 12px;
+}
+
+.o_agent_conv_edit {
+    color: #b0b0b8;
+    opacity: 0;
+}
+
+.o_agent_conv_item:hover .o_agent_conv_edit {
+    opacity: 1;
+}
+
+.o_agent_conv_edit:hover {
+    background: #eef0ff;
+    color: #6366f1;
+}
+
+.o_agent_conv_ok {
+    color: #16a34a;
+}
+
+.o_agent_conv_ok:hover {
+    background: #e9f9ef;
+}
+
+.o_agent_conv_cancel {
+    color: #b0b0b8;
+}
+
+.o_agent_conv_cancel:hover {
+    background: #fde8e8;
+    color: #dc2626;
+}
+
+/* ==================================================================
+   INDICATEUR UNIQUE (evolution) - carte compacte et mise en valeur
+   ================================================================== */
+.o_agent_kpi_solo {
+    justify-content: flex-start;
+}
+
+.o_agent_kpi_solo .o_agent_kpi_card {
+    flex: 0 0 auto;
+    min-width: 230px;
+    max-width: 300px;
+    padding: 18px 22px;
+}
+
+.o_agent_kpi_solo .o_agent_kpi_value {
+    font-size: 30px;
+    letter-spacing: -1px;
+}
+
+.o_agent_kpi_solo .o_agent_kpi_icon {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.o_agent_kpi_solo .o_agent_kpi_label {
+    font-size: 12px;
+    letter-spacing: 0.2px;
+}
+
+/* ==================================================================
+   CARTE D'ACTION (confirmation avant modification)
+   ================================================================== */
+.o_agent_action_box {
+    margin: 14px 0 4px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #ffe0c2;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    animation: block_reveal 0.5s ease both;
+    max-width: 640px;
+}
+
+.o_agent_action_head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #f59e0b, #ea7c1e);
+}
+
+.o_agent_action_body {
+    padding: 15px 18px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #6b7280;
+}
+
+.o_agent_action_btns {
+    display: flex;
+    gap: 10px;
+    padding: 0 18px 18px 18px;
+}
+
+.o_agent_act_cancel,
+.o_agent_act_confirm {
+    padding: 11px 18px;
+    border-radius: 11px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.o_agent_act_cancel {
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+}
+
+.o_agent_act_cancel:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.o_agent_act_confirm {
+    flex: 1;
+    border: none;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #ffffff;
+    box-shadow: 0 5px 14px rgba(34, 197, 94, 0.35);
+}
+
+.o_agent_act_confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(34, 197, 94, 0.45);
+}
+
+/* Etats apres decision */
+.o_agent_action_state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.o_agent_act_running   { color: #6366f1; background: #f5f6ff; }
+.o_agent_act_done      { color: #16a34a; background: #f0fdf4; }
+.o_agent_act_cancelled { color: #6b7280; background: #f9fafb; }
+.o_agent_act_failed    { color: #dc2626; background: #fef2f2; }
+
+.o_agent_action_state i { font-size: 16px; }
+
+/* ==================================================================
+   TABLEAU DE SELECTION (choix des documents a valider)
+   ================================================================== */
+.o_agent_sel_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.o_agent_sel_table thead th {
+    text-align: left;
+    padding: 11px 16px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #8b8b99;
+    background: #fdfaf6;
+    border-bottom: 1px solid #f0e6d8;
+}
+
+.o_agent_sel_table tbody td {
+    padding: 12px 16px;
+    color: #1f2937;
+    border-bottom: 1px solid #f5f5f7;
+}
+
+.o_agent_sel_table tbody tr {
+    cursor: pointer;
+    transition: background 0.12s ease;
+}
+
+.o_agent_sel_table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.o_agent_sel_on {
+    background: #fffdf8;
+}
+
+.o_agent_sel_on:hover {
+    background: #fff8ed;
+}
+
+/* Ligne decochee : estompee */
+.o_agent_sel_off {
+    opacity: 0.45;
+}
+
+.o_agent_sel_off:hover {
+    opacity: 0.7;
+    background: #fafafa;
+}
+
+.o_agent_sel_check {
+    width: 44px;
+    text-align: center !important;
+}
+
+.o_agent_sel_check input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+    accent-color: #f59e0b;
+}
+
+.o_agent_sel_badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #eef0ff;
+    color: #6366f1;
+}
+
+.o_agent_sel_amount {
+    text-align: right !important;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.o_agent_sel_dev {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-left: 3px;
+}
+
+/* Recapitulatif dynamique */
+.o_agent_sel_recap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 16px;
+    background: #fdfaf6;
+    border-top: 1px solid #f0e6d8;
+    font-size: 13px;
+}
+
+.o_agent_sel_count {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.o_agent_sel_total {
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Bouton desactive quand aucune selection */
+.o_agent_act_confirm:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.o_agent_act_confirm:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* ==================================================================
+   CALENDRIER DE PAIEMENT (action "organiser les paiements")
+   Carte groupee par urgence : l'agent a decide, l'utilisateur arbitre.
+   ================================================================== */
+.o_agent_action_box.o_agent_act_plan_payments {
+    border-color: #ddd9fb;
+    max-width: 700px;
+}
+
+.o_agent_act_plan_payments .o_agent_action_head {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #a855f7 100%);
+}
+
+.o_agent_pay_wrap {
+    padding: 14px 16px 4px 16px;
+}
+
+/* ---------------------------------------------- Tout (de)selectionner */
+.o_agent_pay_tools {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.o_agent_pay_all {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 11px;
+    border: 1px solid #e8e6fb;
+    border-radius: 9px;
+    background: #faf9ff;
+    color: #5b56d6;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.o_agent_pay_all:hover {
+    background: #f2f0ff;
+    border-color: #cfc9f7;
+}
+
+/* ------------------------------------------------- Groupe d'urgence */
+.o_agent_pay_group {
+    margin-bottom: 16px;
+}
+
+.o_agent_pay_ghead {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 2px 8px 2px;
+}
+
+.o_agent_pay_dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.o_agent_pay_glabel {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+}
+
+.o_agent_pay_gmeta {
+    margin-left: auto;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.o_agent_pay_gsep {
+    margin: 0 4px;
+    opacity: 0.6;
+}
+
+/* Les 4 tons d'urgence : rouge, ambre, indigo, gris-vert */
+.o_agent_pay_g_retard  .o_agent_pay_dot    { background: #ef4444; }
+.o_agent_pay_g_retard  .o_agent_pay_glabel { color: #dc2626; }
+.o_agent_pay_g_urgent  .o_agent_pay_dot    { background: #f59e0b; }
+.o_agent_pay_g_urgent  .o_agent_pay_glabel { color: #d97706; }
+.o_agent_pay_g_semaine .o_agent_pay_dot    { background: #6366f1; }
+.o_agent_pay_g_semaine .o_agent_pay_glabel { color: #4f46e5; }
+.o_agent_pay_g_avenir  .o_agent_pay_dot    { background: #3b9c9c; }
+.o_agent_pay_g_avenir  .o_agent_pay_glabel { color: #2f8383; }
+
+/* ------------------------------------------------------ Ligne facture */
+.o_agent_pay_row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    margin-bottom: 7px;
+    border: 1px solid #f0f0f4;
+    border-left: 3px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.o_agent_pay_row:hover {
+    border-color: #ddd9fb;
+    transform: translateX(2px);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.09);
+}
+
+.o_agent_pay_on {
+    background: #fcfcff;
+    border-color: #ddd9fb;
+}
+
+.o_agent_pay_off {
+    opacity: 0.55;
+    background: #fafafa;
+}
+
+/* La barre laterale reprend la couleur de l'urgence */
+.o_agent_pay_g_retard  .o_agent_pay_row { border-left-color: #ef4444; }
+.o_agent_pay_g_urgent  .o_agent_pay_row { border-left-color: #f59e0b; }
+.o_agent_pay_g_semaine .o_agent_pay_row { border-left-color: #6366f1; }
+.o_agent_pay_g_avenir  .o_agent_pay_row { border-left-color: #3b9c9c; }
+
+.o_agent_pay_check {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.o_agent_pay_check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #6366f1;
+}
+
+.o_agent_pay_main {
+    flex: 1;
+    min-width: 0;
+}
+
+.o_agent_pay_top {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.o_agent_pay_name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #1f2433;
+}
+
+/* Pastille du delai : "echue depuis 12 jours", "dans 5 jours"... */
+.o_agent_pay_pill {
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.o_agent_pay_g_retard  .o_agent_pay_pill { background: #fef2f2; color: #dc2626; }
+.o_agent_pay_g_urgent  .o_agent_pay_pill { background: #fffbeb; color: #d97706; }
+.o_agent_pay_g_semaine .o_agent_pay_pill { background: #f5f6ff; color: #4f46e5; }
+.o_agent_pay_g_avenir  .o_agent_pay_pill { background: #f0faf9; color: #2f8383; }
+
+/* Mini-frise : echeance -> rappel */
+.o_agent_pay_time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 11.5px;
+    color: #9ca3af;
+    flex-wrap: wrap;
+}
+
+.o_agent_pay_time i {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.o_agent_pay_arrow {
+    margin: 0 3px;
+    color: #c7d2fe;
+}
+
+.o_agent_pay_amt {
+    flex-shrink: 0;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.o_agent_pay_val {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1f2433;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_agent_pay_dev {
+    margin-left: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #9ca3af;
+}
+
+/* Le bouton de confirmation passe en indigo pour cette action :
+   on planifie, on ne valide pas une ecriture comptable. */
+.o_agent_act_plan_payments .o_agent_act_confirm {
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    box-shadow: 0 5px 14px rgba(99, 102, 241, 0.35);
+}
+
+.o_agent_act_plan_payments .o_agent_act_confirm:hover {
+    box-shadow: 0 9px 20px rgba(99, 102, 241, 0.45);
+}
+
+.o_agent_act_plan_payments .o_agent_sel_total {
+    color: #4f46e5;
+    font-weight: 700;
+}
+
+/* Le bandeau de recapitulatif suit la teinte de l'action */
+.o_agent_act_plan_payments .o_agent_sel_recap {
+    background: #faf9ff;
+    border-top-color: #e8e6fb;
+}
+
+/* Lisibilite sur petits ecrans */
+@media (max-width: 760px) {
+    .o_agent_pay_row {
+        flex-wrap: wrap;
+    }
+    .o_agent_pay_amt {
+        width: 100%;
+        text-align: left;
+        padding-left: 28px;
+    }
+}

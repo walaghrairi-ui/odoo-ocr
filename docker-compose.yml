@@ -1,0 +1,52 @@
+name: invoice-ocr
+
+services:
+
+  # -------------------------------------------------------------------
+  #  Base de donnees PostgreSQL
+  # -------------------------------------------------------------------
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-odoo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Decommentez pour acceder a la base depuis votre PC (pgAdmin, DBeaver...)
+    # ports:
+    #   - "5432:5432"
+
+  # -------------------------------------------------------------------
+  #  Odoo 19 + modules Invoice OCR
+  # -------------------------------------------------------------------
+  odoo:
+    build: .
+    image: invoice-ocr-odoo:19.0
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+    environment:
+      # Lus par le script de demarrage de l'image officielle Odoo
+      HOST: db
+      USER: ${POSTGRES_USER:-odoo}
+      PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+    volumes:
+      # Fichiers Odoo (pieces jointes, sessions) + modeles PaddleOCR telecharges
+      - odoo-data:/var/lib/odoo
+      # Developpement : vos modules sont montes en direct, sans reconstruire
+      # l'image. Retirez cette ligne en production (l'image les contient deja).
+      - ./custom_addons:/mnt/extra-addons
+
+volumes:
+  db-data:
+  odoo-data:

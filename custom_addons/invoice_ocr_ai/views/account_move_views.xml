@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_ocr_button" model="ir.ui.view">
+        <field name="name">account.move.ocr.button</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_post']" position="before">
+                <button name="action_extract_ocr"
+                        string="Saisie automatique"
+                        type="object"
+                        class="btn-primary"
+                        icon="fa-magic"
+                        invisible="move_type not in ['in_invoice', 'in_receipt']"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
