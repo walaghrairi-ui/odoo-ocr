@@ -26,6 +26,19 @@ RUN python3 -m pip freeze --all 2>/dev/null \
         -r /tmp/requirements.txt \
     && rm -f /tmp/requirements.txt /tmp/odoo-constraints.txt
 
+# Modeles PaddleOCR telecharges des la construction de l'image.
+# Sans cette etape, PaddleOCR les telecharge a la premiere lecture d'une
+# image, dans le dossier temporaire du conteneur : la saisie devient tres
+# lente, le conteneur cesse de repondre a Azure et il est redemarre.
+# /opt/paddleocr est hors du volume /var/lib/odoo, donc conserve dans l'image.
+# Memes parametres que le module invoice_ocr_image : memes modeles.
+ENV PADDLE_OCR_BASE_DIR=/opt/paddleocr/
+RUN mkdir -p /opt/paddleocr && chown odoo:odoo /opt/paddleocr
+USER odoo
+RUN python3 -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=True, lang='fr')" \
+    && find /opt/paddleocr -name '*.pdmodel' | sort
+USER root
+
 # Script de demarrage : injecte le mot de passe maitre fourni par Azure.
 # sed retire d'eventuels retours chariot Windows (CRLF) qui casseraient bash.
 COPY docker/odoo-entrypoint.sh /usr/local/bin/odoo-entrypoint.sh
